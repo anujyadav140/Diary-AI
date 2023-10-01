@@ -41,6 +41,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   firebase_core: 
+  action_slider: ^0.7.0
+  audioplayers: ^5.1.0
   curved_navigation_bar: ^1.0.3
   audio_waveforms: ^1.0.4
   auto_size_text: ^3.0.0

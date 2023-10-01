@@ -67,16 +67,6 @@ class _WaveBubbleState extends State<WaveBubble> {
       path: widget.path ?? file!.path,
       shouldExtractWaveform: widget.index?.isEven ?? true,
     );
-    // Extracting waveform separately if index is odd.
-    if (widget.index?.isOdd ?? false) {
-      controller
-          .extractWaveformData(
-            path: widget.path ?? file!.path,
-            noOfSamples:
-                playerWaveStyle.getSamplesForWidth(widget.width ?? 200),
-          )
-          .then((waveformData) => debugPrint(waveformData.toString()));
-    }
   }
 
   @override
@@ -90,44 +80,30 @@ class _WaveBubbleState extends State<WaveBubble> {
   Widget build(BuildContext context) {
     return widget.path != null || file?.path != null
         ? Align(
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!controller.playerState.isStopped)
-                    IconButton(
-                      onPressed: () async {
-                        controller.playerState.isPlaying
-                            ? await controller.pausePlayer()
-                            : await controller.startPlayer(
-                                finishMode: FinishMode.pause,
-                                forceRefresh: false,
-                              );
-                      },
-                      icon: Icon(
-                        controller.playerState.isPlaying
-                            ? Icons.stop
-                            : Icons.play_arrow,
-                      ),
-                      color: Colors.black,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!controller.playerState.isStopped)
+                  IconButton(
+                    onPressed: () async {
+                      controller.playerState.isPlaying
+                          ? await controller.pausePlayer()
+                          : await controller.startPlayer(
+                              finishMode: FinishMode.pause,
+                              forceRefresh: false,
+                            );
+                    },
+                    icon: Icon(
+                      controller.playerState.isPlaying
+                          ? Icons.stop
+                          : Icons.play_arrow,
+                      size: 30,
                     ),
-                  AudioFileWaveforms(
-                    size: Size(MediaQuery.of(context).size.width / 2,
-                        MediaQuery.of(context).size.height / 6),
-                    playerController: controller,
-                    waveformType: WaveformType.long,
-                    enableSeekGesture: true,
-                    playerWaveStyle: playerWaveStyle,
+                    color: Colors.black,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   ),
-                ],
-              ),
+              ],
             ),
           )
         : const SizedBox.shrink();
