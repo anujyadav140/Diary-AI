@@ -2,8 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:diarify_ai/components/slide_act.dart';
-import 'package:diarify_ai/pages/audio_player.dart';
-import 'package:diarify_ai/pages/wave.dart';
+import 'package:diarify_ai/components/audio_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -82,14 +81,14 @@ class _DiarifyHomeState extends State<DiarifyHome> {
               height: 100,
               padding: const EdgeInsets.only(left: 20, top: 20),
               alignment: Alignment.centerLeft,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: const Column(children: [
+              child: Column(children: [
                 Text(
                   'Hi, Ahir!',
                   style: TextStyle(
@@ -112,7 +111,7 @@ class _DiarifyHomeState extends State<DiarifyHome> {
             Expanded(
                 child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -122,10 +121,68 @@ class _DiarifyHomeState extends State<DiarifyHome> {
               child: isRecording
                   ? Container()
                   : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        DiarifyAudioPlayer(path: path),
-                        const SizedBox(height: 20),
-                        const SlideToAct(),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.08),
+                          child: DiarifyAudioPlayer(path: path),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: _startOrStopRecording,
+                                child: const Column(
+                                  children: [
+                                    Text(
+                                      'Restart',
+                                      style: TextStyle(
+                                        color: Colors
+                                            .black, // Change the color as needed
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_back,
+                                      size: 30,
+                                      color: Colors
+                                          .black, // Change the color as needed
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                  width:
+                                      20), // Add some spacing between the GestureDetector widgets
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle Continue action
+                                },
+                                child: const Column(
+                                  children: [
+                                    Text(
+                                      'Continue',
+                                      style: TextStyle(
+                                        color: Colors
+                                            .black, // Change the color as needed
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons
+                                          .arrow_forward, // You may need to replace with the actual icon you want to use
+                                      size: 30,
+                                      color: Colors
+                                          .black, // Change the color as needed
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
             ))
