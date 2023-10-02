@@ -1,14 +1,23 @@
-
-import 'package:diarify_ai/pages/home.dart';
+import 'package:diarify/authentication/authgate.dart';
+import 'package:diarify/firebase_options.dart';
+import 'package:diarify/pages/home.dart';
+import 'package:diarify/pages/login.dart';
+import 'package:diarify/services/authservice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  runApp(const MyApp());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(ChangeNotifierProvider(
+    create: (context) => AuthService(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +32,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const DiarifyHome(),
+      // home: const DiarifyHome(),
+      home: const AuthGate(),
     );
   }
 }

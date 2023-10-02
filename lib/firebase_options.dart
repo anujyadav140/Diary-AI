@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDKydAfPYRHeTF90kSwVwQTawAwujAJTxo',
-    appId: '1:608514329910:android:e0e50e95476ff5507c3797',
-    messagingSenderId: '608514329910',
-    projectId: 'diarify-ai',
-    storageBucket: 'diarify-ai.appspot.com',
+    apiKey: 'AIzaSyDCCpxhJ0lD_oHxcPgdlFmo-_GYcjKzHP4',
+    appId: '1:789340116026:android:9adb81688e979d4d881103',
+    messagingSenderId: '789340116026',
+    projectId: 'diarify-cd6e0',
+    storageBucket: 'diarify-cd6e0.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBAQAwy6-NKip85jLvGJiP2nH1-rOXKMy0',
-    appId: '1:608514329910:ios:fa16aeeddf517bd17c3797',
-    messagingSenderId: '608514329910',
-    projectId: 'diarify-ai',
-    storageBucket: 'diarify-ai.appspot.com',
-    iosBundleId: 'com.example.diarify',
+    apiKey: 'AIzaSyAEIZTo1ynDNqkLASOKaRA8kbTvmHod7TY',
+    appId: '1:789340116026:ios:32ff97c0122796c9881103',
+    messagingSenderId: '789340116026',
+    projectId: 'diarify-cd6e0',
+    storageBucket: 'diarify-cd6e0.appspot.com',
+    iosBundleId: 'com.example.diarifyAi',
   );
 }

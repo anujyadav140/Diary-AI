@@ -1,5 +1,5 @@
-name: diarify_ai
-description: A new Flutter project.
+name: diarify
+description: Diarify your moments...
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,12 +40,18 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  firebase_core: 
+  firebase_core: ^2.16.0 
+  cloud_firestore: ^4.9.2
+  firebase_auth: ^4.10.0
+  provider: ^6.0.5
   action_slider: ^0.7.0
   audioplayers: ^5.1.0
+  simple_animations: ^5.0.2
+  google_sign_in: ^6.1.5
   curved_navigation_bar: ^1.0.3
   audio_waveforms: ^1.0.4
   auto_size_text: ^3.0.0
+  rename: ^3.0.0
   path_provider: ^2.1.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

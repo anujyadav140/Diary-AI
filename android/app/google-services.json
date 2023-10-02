@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "789340116026",
+    "project_id": "diarify-cd6e0",
+    "storage_bucket": "diarify-cd6e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789340116026:android:9adb81688e979d4d881103",
+        "android_client_info": {
+          "package_name": "com.example.diarify_ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "789340116026-ihajqetp6rhkiksr2441f91njl23s4iv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.diarify_ai",
+            "certificate_hash": "72f5f3fe2b214aba5ecaa215b2140c689e725087"
+          }
+        },
+        {
+          "client_id": "789340116026-ccf2gpkfiu4uo9tfoji9rpuvu4u8uhsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCCpxhJ0lD_oHxcPgdlFmo-_GYcjKzHP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "789340116026-ccf2gpkfiu4uo9tfoji9rpuvu4u8uhsh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "789340116026-pajm0vflsligul9o52a7bk35b1s2jj7b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.diarifyAi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

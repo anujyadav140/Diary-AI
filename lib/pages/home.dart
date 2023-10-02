@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:diarify_ai/components/slide_act.dart';
-import 'package:diarify_ai/components/audio_player.dart';
+import 'package:diarify/components/slide_act.dart';
+import 'package:diarify/components/audio_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -81,14 +81,14 @@ class _DiarifyHomeState extends State<DiarifyHome> {
               height: 100,
               padding: const EdgeInsets.only(left: 20, top: 20),
               alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: Column(children: [
+              child: const Column(children: [
                 Text(
                   'Hi, Ahir!',
                   style: TextStyle(
@@ -111,7 +111,7 @@ class _DiarifyHomeState extends State<DiarifyHome> {
             Expanded(
                 child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
