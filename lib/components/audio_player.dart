@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class DiarifyAudioPlayer extends StatefulWidget {
-  const DiarifyAudioPlayer({super.key, this.path});
+  const DiarifyAudioPlayer({super.key, this.path, required this.display});
+  final bool display;
   final String? path;
 
   @override
@@ -56,49 +57,50 @@ class _DiarifyAudioPlayerState extends State<DiarifyAudioPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          child: Slider(
-            activeColor: Colors.black,
-            inactiveColor: Colors.black54,
-            thumbColor: Colors.black,
-            min: 0,
-            max: duration.inSeconds.toDouble(),
-            value: position.inSeconds
-                .toDouble()
-                .clamp(0, duration.inSeconds.toDouble()), // Clamp the value
-            onChanged: (value) async {
-              final position = Duration(seconds: value.toInt());
-              audioPlayer.seek(position);
-            },
-          ),
-        ),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(formatTime(position)),
-          Text(formatTime(duration - position)),
-        ]),
-        CircleAvatar(
-          backgroundColor: Colors.black,
-          child: IconButton(
-            icon: Icon(
-              isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              if (isPlaying) {
-                audioPlayer.pause();
-              } else {
-                audioPlayer.play(DeviceFileSource(widget.path!));
-              }
-              setState(() {
-                isPlaying = !isPlaying;
-              });
-            },
-          ),
-        )
-      ],
-    );
+    return widget.display
+        ? Column(
+            children: [
+              SizedBox(
+                child: Slider(
+                  activeColor: Colors.black,
+                  inactiveColor: Colors.black54,
+                  thumbColor: Colors.black,
+                  min: 0,
+                  max: duration.inSeconds.toDouble(),
+                  value: position.inSeconds.toDouble().clamp(
+                      0, duration.inSeconds.toDouble()), // Clamp the value
+                  onChanged: (value) async {
+                    final position = Duration(seconds: value.toInt());
+                    audioPlayer.seek(position);
+                  },
+                ),
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text(formatTime(position)),
+                Text(formatTime(duration - position)),
+              ]),
+              CircleAvatar(
+                backgroundColor: Colors.black,
+                child: IconButton(
+                  icon: Icon(
+                    isPlaying ? Icons.pause : Icons.play_arrow,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (isPlaying) {
+                      audioPlayer.pause();
+                    } else {
+                      audioPlayer.play(DeviceFileSource(widget.path!));
+                    }
+                    setState(() {
+                      isPlaying = !isPlaying;
+                    });
+                  },
+                ),
+              )
+            ],
+          )
+        : Container();
   }
 
   String formatTime(Duration duration) {
