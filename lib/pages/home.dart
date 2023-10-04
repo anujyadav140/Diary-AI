@@ -59,6 +59,7 @@ class _DiarifyHomeState extends State<DiarifyHome> {
       appBar: AppBar(
           title: Text('Hi, $firstName',
               style: const TextStyle(color: Colors.white)),
+          // title: Text('Hi, Ahir', style: const TextStyle(color: Colors.white)),
           backgroundColor: Colors.black,
           elevation: 0.0,
           leading: Padding(

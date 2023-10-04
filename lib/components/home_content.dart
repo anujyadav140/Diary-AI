@@ -114,7 +114,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
             const SizedBox(height: 20),
             !isMicActive
                 ? DiarifySnippet(
-                    date: DateFormat('EE\ndd').format(selectedDate),
+                    date: "#1\n${DateFormat('EE\ndd').format(selectedDate)}",
                     time: "00:00",
                     diaryContent:
                         "Today... was... a... really... nice... day...")

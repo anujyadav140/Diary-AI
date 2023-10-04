@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rive/rive.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class DiarifySnippet extends StatefulWidget {
   const DiarifySnippet(
@@ -17,11 +19,20 @@ class DiarifySnippet extends StatefulWidget {
 }
 
 class _DiarifySnippetState extends State<DiarifySnippet> {
+  late StateMachineController? _riveController;
+  bool isClick = false;
+  SMIInput<bool>? isRiveClicked;
+  bool isRiveAnimationPlaying = false;
   String getCurrentTime() {
     final now = DateTime.now();
     final formattedTime =
         DateFormat('hh:mm a').format(now); // Format the time as desired
     return formattedTime;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   List<String> tags = ['Funny', 'Sad', 'Eclectic', 'Anecdotal'];
@@ -44,21 +55,6 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
               "Time: ${getCurrentTime()}",
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width / 20,
-              ),
-            ),
-            // Add the horizontal scrollable ListView.builder for tags
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(tags.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Chip(
-                      label: Text(tags[index]),
-                      // You can customize the appearance of the chips as needed
-                    ),
-                  );
-                }),
               ),
             ),
             Container(
@@ -90,8 +86,9 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                         padding: const EdgeInsets.only(left: 12.0, right: 30.0),
                         child: Text(
                           widget.date,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width / 22,
+                              color: Colors.white),
                         ),
                       ),
                     ),
@@ -99,12 +96,34 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   Expanded(
                     child: Text(
                       widget.diaryContent,
-                      style: const TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width / 30),
                     ),
                   ),
                 ],
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(tags.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Chip(
+                      elevation: 0.8,
+                      shape: ContinuousRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      label: Text(
+                        tags[index],
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width / 30,
+                            color: Colors.black),
+                      ),
+                      backgroundColor: Colors.white,
+                      shadowColor: Colors.black,
+                    ),
+                  );
+                }),
               ),
             ),
             Row(
@@ -113,7 +132,7 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   height: MediaQuery.of(context).size.height * 0.3,
                   width: MediaQuery.of(context).size.width * 0.4,
                   margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.05,
+                    top: MediaQuery.of(context).size.height * 0.025,
                   ),
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -129,7 +148,11 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Add image here'),
+                      Text(
+                        'Add image here',
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width / 30),
+                      ),
                       IconButton(
                         onPressed: () {},
                         icon: Icon(Icons.image),
@@ -137,13 +160,77 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 100,
-                  height: 100,
-                  margin: const EdgeInsets.only(top: 100, left: 60),
-                  child: const RiveAnimation.asset(
-                    'assets/hedgehog.riv',
-                    fit: BoxFit.cover,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment
+                        .start, // Align items in the center vertically
+                    children: [
+                      isRiveAnimationPlaying
+                          ? AnimatedTextKit(
+                              isRepeatingAnimation: true,
+                              animatedTexts: [
+                                TypewriterAnimatedText('Thank you!',
+                                    textStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width /
+                                                25)),
+                                TypewriterAnimatedText('Helping you!',
+                                    textStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width /
+                                                25)),
+                              ],
+                            )
+                          : Container(),
+                      !isRiveAnimationPlaying
+                          ? AnimatedTextKit(
+                              isRepeatingAnimation: true,
+                              animatedTexts: [
+                                TypewriterAnimatedText('Click on me!',
+                                    textStyle: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.width /
+                                                25)),
+                                TypewriterAnimatedText('Talk to me!',
+                                    textStyle: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.width /
+                                                25)),
+                              ],
+                            )
+                          : Container(),
+                      Container(
+                        width: 150,
+                        height: 150,
+                        margin: const EdgeInsets.only(
+                            top: 5), // Adjust the top margin as needed
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isClick = !isClick;
+                              isRiveAnimationPlaying = !isRiveAnimationPlaying;
+                            });
+                            isRiveClicked?.change(isClick);
+                          },
+                          child: RiveAnimation.asset(
+                            'assets/hedgehog.riv',
+                            fit: BoxFit.cover,
+                            stateMachines: const ['State Machine 1'],
+                            onInit: (artboard) {
+                              _riveController =
+                                  StateMachineController.fromArtboard(
+                                      artboard, "State Machine 1");
+                              if (_riveController == null) return;
+                              artboard.addController(_riveController!);
+                              isRiveClicked =
+                                  _riveController?.findInput<bool>("Walk");
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
