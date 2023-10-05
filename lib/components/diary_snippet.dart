@@ -30,6 +30,13 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
     return formattedTime;
   }
 
+  String getCurrentDate() {
+    final now = DateTime.now();
+    final formattedDate =
+        DateFormat('dd/MM/yyyy').format(now); // Example format: "yyyy-MM-dd"
+    return formattedDate;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,84 +59,119 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
         child: Column(
           children: [
             Text(
-              "Time: ${getCurrentTime()}",
+              "${getCurrentDate()} - ${getCurrentTime()}",
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width / 20,
               ),
             ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.15,
-              margin: const EdgeInsets.only(top: 10),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(2, 2),
-                  ),
-                ],
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 10.0),
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+            Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Diary Entry #121:",
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width / 25,
+                          color: Colors.black),
                     ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12.0, right: 30.0),
-                        child: Text(
-                          widget.date,
-                          style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width / 22,
-                              color: Colors.white),
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  margin: const EdgeInsets.only(top: 10),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 10.0),
+                        decoration: const BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 12.0, right: 30.0),
+                            child: Text(
+                              widget.date,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width / 22,
+                                  color: Colors.white),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      widget.diaryContent,
-                      style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width / 30),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(tags.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Chip(
-                      elevation: 0.8,
-                      shape: ContinuousRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      label: Text(
-                        tags[index],
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width / 30,
-                            color: Colors.black),
+                      Expanded(
+                        child: Text(
+                          widget.diaryContent,
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width / 30),
+                        ),
                       ),
-                      backgroundColor: Colors.white,
-                      shadowColor: Colors.black,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Tags:",
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width / 25,
+                          color: Colors.black),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(tags.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Chip(
+                          elevation: 0.8,
+                          shape: ContinuousRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          label: Text(
+                            tags[index],
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width / 30,
+                                color: Colors.white),
+                          ),
+                          backgroundColor: Colors.black,
+                          shadowColor: Colors.black,
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
             ),
             Row(
               children: [
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.3,
+                  height: MediaQuery.of(context).size.height * 0.25,
                   width: MediaQuery.of(context).size.width * 0.4,
                   margin: EdgeInsets.only(
                     top: MediaQuery.of(context).size.height * 0.025,

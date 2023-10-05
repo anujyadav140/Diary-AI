@@ -41,7 +41,7 @@ class _DiarifyHomeState extends State<DiarifyHome> {
         firstName = nameParts[0];
       }
     }
-    pageController = PageController(initialPage: 1);
+    pageController = PageController(initialPage: 1, viewportFraction: 0.9999);
     currentPage = 1;
     super.initState();
   }
@@ -57,9 +57,9 @@ class _DiarifyHomeState extends State<DiarifyHome> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-          title: Text('Hi, $firstName',
-              style: const TextStyle(color: Colors.white)),
-          // title: Text('Hi, Ahir', style: const TextStyle(color: Colors.white)),
+          // title: Text('Hi, $firstName',
+          //     style: const TextStyle(color: Colors.white)),
+          title: Text('Hi, Ahir', style: const TextStyle(color: Colors.white)),
           backgroundColor: Colors.black,
           elevation: 0.0,
           leading: Padding(
@@ -84,13 +84,9 @@ class _DiarifyHomeState extends State<DiarifyHome> {
       body: SafeArea(
         child: PageView(
           scrollDirection: Axis.horizontal,
+          // physics: const AlwaysScrollableScrollPhysics(),
           physics: const NeverScrollableScrollPhysics(),
           controller: pageController, // Assign the page controller
-          onPageChanged: (int page) {
-            setState(() {
-              currentPage = page; // Update the current page index
-            });
-          },
           children: const [
             DiarifyDay(),
             DiarifyHomeContent(),
@@ -123,6 +119,11 @@ class _DiarifyHomeState extends State<DiarifyHome> {
               size: 30),
         ],
         onTap: (index) {
+          setState(() {
+            currentPage = index;
+          });
+          print(index);
+          print(currentPage);
           // Handle button tap by changing the current page
           pageController.animateToPage(
             index,
