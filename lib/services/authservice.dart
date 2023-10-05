@@ -102,4 +102,13 @@ class AuthService extends ChangeNotifier {
     _isSelectDatesClicked = value;
     notifyListeners();
   }
+
+  int _currentDayIndex = 0;
+
+  int get currentDayIndex => _currentDayIndex;
+
+  set currentDayIndex(int value) {
+    _currentDayIndex = value;
+    notifyListeners();
+  }
 }

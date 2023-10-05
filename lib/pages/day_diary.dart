@@ -1,5 +1,8 @@
+import 'package:diarify/services/authservice.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:provider/provider.dart';
 
 class DiarifyDay extends StatefulWidget {
   const DiarifyDay({super.key, required this.isSelectDatesClicked});
@@ -11,13 +14,46 @@ class DiarifyDay extends StatefulWidget {
 
 class _DiarifyDayState extends State<DiarifyDay> {
   DateTime? selectedDate;
+  bool isSelected = false;
+  bool scrollDone = false;
+  final ScrollOffsetController scrollOffsetController =
+      ScrollOffsetController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+  final ScrollOffsetListener scrollOffsetListener =
+      ScrollOffsetListener.create();
+
+  final ItemScrollController controller =
+      ItemScrollController(); // Declare it as nullable
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> scrollToCurrentDay() async {
+    if (widget.isSelectDatesClicked && !scrollDone) {
+      final now = DateTime.now();
+      final index = now.day - 3;
+      Future.delayed(const Duration(milliseconds: 1)).then((value) => controller
+          .scrollTo(index: index, duration: const Duration(milliseconds: 1))
+          .then((value) => scrollDone = true));
+    }
+    if (!widget.isSelectDatesClicked) {
+      scrollDone = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final firstDayOfMonth = DateTime(now.year, now.month, 1);
-
+    scrollToCurrentDay();
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -29,9 +65,12 @@ class _DiarifyDayState extends State<DiarifyDay> {
             ),
             widget.isSelectDatesClicked
                 ? SizedBox(
-                    height:
-                        100.0, // Adjust the height of the chip row as needed
-                    child: ListView.builder(
+                    height: MediaQuery.of(context).size.height * 0.12,
+                    child: ScrollablePositionedList.builder(
+                      itemScrollController: controller,
+                      scrollOffsetController: scrollOffsetController,
+                      itemPositionsListener: itemPositionsListener,
+                      scrollOffsetListener: scrollOffsetListener,
                       scrollDirection: Axis.horizontal,
                       itemCount: daysInMonth,
                       itemBuilder: (context, index) {
@@ -41,7 +80,7 @@ class _DiarifyDayState extends State<DiarifyDay> {
                         final isCurrentDay = day == now.day;
                         final isFutureDay =
                             date.isAfter(now); // Check if it's a future date
-                        final isSelected = date == selectedDate;
+                        isSelected = date == selectedDate;
 
                         return GestureDetector(
                           onTap: () {
@@ -75,7 +114,7 @@ class _DiarifyDayState extends State<DiarifyDay> {
                                           : Colors.white),
                                   borderRadius: BorderRadius.circular(8.0),
                                   border: Border.all(
-                                      width: isCurrentDay ? 2.0 : 1.0,
+                                      width: isCurrentDay ? 3.5 : 1.0,
                                       color: Colors.white)),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
