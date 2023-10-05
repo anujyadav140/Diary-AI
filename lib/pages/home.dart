@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class DiarifyHome extends StatefulWidget {
   const DiarifyHome({super.key});
@@ -26,17 +27,15 @@ class _DiarifyHomeState extends State<DiarifyHome> {
   String firstName = '';
   String profilePic = '';
   PageController pageController = PageController();
-  int currentPage = 0; // Current page index
+  int currentPage = 0;
   @override
   void initState() {
-    // Retrieve the currently signed-in user
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       displayName = user.displayName!;
       profilePic = user.photoURL!;
       if (displayName.isNotEmpty) {
-        // Split the full name by spaces and take the first part
         List<String> nameParts = displayName.split(' ');
         firstName = nameParts[0];
       }
@@ -57,9 +56,12 @@ class _DiarifyHomeState extends State<DiarifyHome> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-          // title: Text('Hi, $firstName',
-          //     style: const TextStyle(color: Colors.white)),
-          title: Text('Hi, Ahir', style: const TextStyle(color: Colors.white)),
+          title: currentPage == 0
+              ? const Text('Diary Entries',
+                  style: TextStyle(color: Colors.white))
+              : Text('Hi, $firstName',
+                  style: const TextStyle(color: Colors.white)),
+          // title: Text('Hi, Ahir', style: const TextStyle(color: Colors.white)),
           backgroundColor: Colors.black,
           elevation: 0.0,
           leading: Padding(
@@ -70,32 +72,58 @@ class _DiarifyHomeState extends State<DiarifyHome> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.settings,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: () {
-                AuthService().logout();
-              },
-            ),
+            currentPage == 0
+                ? IconButton(
+                    onPressed: () {
+                      setState(() {
+                        context.read<AuthService>().isSelectDatesClicked =
+                            !context.read<AuthService>().isSelectDatesClicked;
+                      });
+                    },
+                    icon: Icon(
+                      context.read<AuthService>().isSelectDatesClicked
+                          ? Icons.calendar_today
+                          : Icons.calendar_today_outlined,
+                      color: Colors.white,
+                      size: 30,
+                    ))
+                : IconButton(
+                    icon: const Icon(
+                      Icons.settings,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      AuthService().logout();
+                    },
+                  ),
           ]),
       body: SafeArea(
         child: PageView(
           scrollDirection: Axis.horizontal,
-          // physics: const AlwaysScrollableScrollPhysics(),
           physics: const NeverScrollableScrollPhysics(),
-          controller: pageController, // Assign the page controller
-          children: const [
-            DiarifyDay(),
-            DiarifyHomeContent(),
-            DiarifyCalender()
+          controller: pageController,
+          onPageChanged: (value) {
+            setState(() {
+              currentPage = value;
+            });
+          },
+          children: [
+            Consumer(
+              builder: (context, value, child) {
+                return DiarifyDay(
+                  isSelectDatesClicked:
+                      context.read<AuthService>().isSelectDatesClicked,
+                );
+              },
+            ),
+            const DiarifyHomeContent(),
+            const DiarifyCalender()
           ],
         ),
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        index: 1,
+        index: currentPage,
         color:
             currentPage == 0 || currentPage == 2 ? Colors.white : Colors.black,
         backgroundColor:
@@ -122,9 +150,6 @@ class _DiarifyHomeState extends State<DiarifyHome> {
           setState(() {
             currentPage = index;
           });
-          print(index);
-          print(currentPage);
-          // Handle button tap by changing the current page
           pageController.animateToPage(
             index,
             duration: const Duration(milliseconds: 300),

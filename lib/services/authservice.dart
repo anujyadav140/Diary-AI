@@ -94,44 +94,12 @@ class AuthService extends ChangeNotifier {
     return tokenCounterValue;
   }
 
-  bool _isRhymeSelectedLines = false;
+  bool _isSelectDatesClicked = false;
 
-  bool get isRhymeSelectedLines => _isRhymeSelectedLines;
+  bool get isSelectDatesClicked => _isSelectDatesClicked;
 
-  set isRhymeSelectedLines(bool value) {
-    _isRhymeSelectedLines = value;
-    notifyListeners();
-  }
-
-  bool _isConvertToMetre = false;
-
-  bool get isConvertToMetre => _isConvertToMetre;
-
-  set isConvertToMetre(bool value) {
-    _isConvertToMetre = value;
-    notifyListeners();
-  }
-
-  bool _isCustomInstruct = false;
-
-  bool get isCustomInstruct => _isCustomInstruct;
-
-  set isCustomInstruct(bool value) {
-    _isCustomInstruct = value;
-    notifyListeners();
-  }
-
-  int _toAdsCount = 1;
-
-  int get toAdsCount => _toAdsCount;
-
-  void incrementAdsCounter() {
-    _toAdsCount++;
-    notifyListeners();
-  }
-
-  void resetAdsCounter() {
-    _toAdsCount = 1;
+  set isSelectDatesClicked(bool value) {
+    _isSelectDatesClicked = value;
     notifyListeners();
   }
 }
