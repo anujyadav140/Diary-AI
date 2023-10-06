@@ -5,6 +5,7 @@ import 'package:diarify/components/diary_snippet.dart';
 import 'package:diarify/components/idle.dart';
 import 'package:diarify/components/slide_act.dart';
 import 'package:diarify/components/audio_player.dart';
+import 'package:diarify/pages/diarify_generation.dart';
 import 'package:diarify/services/authservice.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,7 +27,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   late final RecorderController recorderController;
   AudioPlayer audioPlayer = AudioPlayer();
 
-  String? path;
+  String path = '';
   String? musicFile;
   bool isRecording = false;
   bool isMicActive = false;
@@ -181,7 +182,15 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                                                   20), // Add some spacing between the GestureDetector widgets
                                           GestureDetector(
                                             onTap: () {
-                                              // Handle Continue action
+                                              print(path);
+                                              Navigator.push(context,
+                                                  MaterialPageRoute(
+                                                builder: (context) {
+                                                  return DiarifyGeneration(
+                                                    path: path,
+                                                  );
+                                                },
+                                              ));
                                             },
                                             child: const Column(
                                               children: [

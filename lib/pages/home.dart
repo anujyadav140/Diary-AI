@@ -6,6 +6,7 @@ import 'package:diarify/components/slide_act.dart';
 import 'package:diarify/components/audio_player.dart';
 import 'package:diarify/pages/calender_diary.dart';
 import 'package:diarify/pages/day_diary.dart';
+import 'package:diarify/pages/diarify_generation.dart';
 import 'package:diarify/services/authservice.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -94,7 +95,7 @@ class _DiarifyHomeState extends State<DiarifyHome> {
                       size: 30,
                     ),
                     onPressed: () {
-                      AuthService().logout();
+                      // AuthService().logout();
                     },
                   ),
           ]),
