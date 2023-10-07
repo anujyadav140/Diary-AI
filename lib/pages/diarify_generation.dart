@@ -25,7 +25,7 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
     var request = http.MultipartRequest('POST', url);
     request.headers.addAll(({"Authorization": "Bearer $apiKey"}));
     request.fields["model"] = "whisper-1";
-    request.fields["language"] = "hi";
+    request.fields["language"] = "en";
     request.files.add(await http.MultipartFile.fromPath('file', widget.path));
     var response = await request.send();
     var newResponse = await http.Response.fromStream(response);
@@ -44,8 +44,8 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
 
   @override
   void initState() {
-    convertSpeechToText(widget.path)
-        .then((value) => chatCompleteWithSSE(value));
+    // convertSpeechToText(widget.path)
+    //     .then((value) => chatCompleteWithSSE(value));
     super.initState();
   }
 
@@ -129,6 +129,10 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
                 Text(emotionTags.isEmpty
                     ? 'No tags found'
                     : emotionTags.join(', ')),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Save To Diary'),
+                )
               ],
             ),
           ),

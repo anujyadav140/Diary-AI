@@ -15,6 +15,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rive/rive.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class DiarifyHomeContent extends StatefulWidget {
   const DiarifyHomeContent({super.key});
@@ -142,10 +144,43 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                                     display:
                                         !isRecording && isRecordingCompleted,
                                   )
-                                : const Center(
-                                    child: CircularProgressIndicator(
-                                    color: Colors.black,
-                                  )),
+                                : Column(
+                                    children: [
+                                      AnimatedTextKit(
+                                        isRepeatingAnimation: true,
+                                        animatedTexts: [
+                                          TypewriterAnimatedText(
+                                              'Describe your day, thoughts, feelings and so on ...',
+                                              textStyle: TextStyle(
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          25)),
+                                          TypewriterAnimatedText('Listening...',
+                                              textStyle: TextStyle(
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          25)),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.1),
+                                        child: Lottie.asset(
+                                          'assets/mic_loading.json',
+                                          width: 200,
+                                          height: 200,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ),
                           Padding(
                             padding: EdgeInsets.only(
