@@ -111,4 +111,22 @@ class AuthService extends ChangeNotifier {
     _currentDayIndex = value;
     notifyListeners();
   }
+
+  DiarySettingsModel _settings = DiarySettingsModel();
+
+  DiarySettingsModel get settings => _settings;
+
+  set settings(DiarySettingsModel value) {
+    _settings = value;
+    notifyListeners();
+  }
+}
+
+class DiarySettingsModel {
+  String selectedWordLimit = '300';
+  String selectedStyle = 'Casual';
+  String selectedTry = 'Be factual';
+  String selectedEmotionTags = 'Yes';
+  String selectedInspirationalQuotes = 'No';
+  String additionalDirections = '';
 }

@@ -1,12 +1,15 @@
 import 'package:diarify/pages/home.dart';
+import 'package:diarify/services/authservice.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CustomChoiceChip extends StatelessWidget {
   final String label;
   final bool selected;
   final Function(bool) onSelected;
 
-  CustomChoiceChip({
+  const CustomChoiceChip({
+    super.key,
     required this.label,
     required this.selected,
     required this.onSelected,
@@ -39,14 +42,30 @@ class DiarifySettings extends StatefulWidget {
 }
 
 class _DiarifySettingsState extends State<DiarifySettings> {
-  String? selectedWordLimit;
-  String? selectedStyle;
-  String? selectedTry;
-  String? selectedEmotionTags;
-  String? selectedInspirationalQuotes;
-  String? additionalDirections;
+  String selectedWordLimit = ''; // Initialize with '300'
+  String selectedStyle = ''; // Initialize with 'Casual'
+  String selectedTry = ''; // Initialize with 'Be factual'
+  String selectedEmotionTags = ''; // Initialize with 'Yes'
+  String selectedInspirationalQuotes = ''; // Initialize with 'No'
+  String additionalDirections = '';
+  String hintDirections = '';
+  @override
+  void initState() {
+    selectedWordLimit = context.read<AuthService>().settings.selectedWordLimit;
+    selectedStyle = context.read<AuthService>().settings.selectedStyle;
+    selectedTry = context.read<AuthService>().settings.selectedTry;
+    selectedEmotionTags =
+        context.read<AuthService>().settings.selectedEmotionTags;
+    selectedInspirationalQuotes =
+        context.read<AuthService>().settings.selectedInspirationalQuotes;
+    additionalDirections =
+        context.read<AuthService>().settings.additionalDirections;
+    hintDirections =
+        'Previous: ${context.read<AuthService>().settings.additionalDirections}';
+    super.initState();
+  }
 
-  void handleChoiceSelected(String? choice, String groupName) {
+  void handleChoiceSelected(String choice, String groupName) {
     setState(() {
       switch (groupName) {
         case 'WordLimit':
@@ -130,6 +149,13 @@ class _DiarifySettingsState extends State<DiarifySettings> {
                     selected: selectedWordLimit == '100',
                     onSelected: (selected) {
                       handleChoiceSelected('100', 'WordLimit');
+                    },
+                  ),
+                  CustomChoiceChip(
+                    label: '300',
+                    selected: selectedWordLimit == '300',
+                    onSelected: (selected) {
+                      handleChoiceSelected('300', 'WordLimit');
                     },
                   ),
                   CustomChoiceChip(
@@ -264,20 +290,23 @@ class _DiarifySettingsState extends State<DiarifySettings> {
                 padding: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
                 child: TextField(
                   cursorColor: Colors.black,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     focusColor: Colors.black,
                     hoverColor: Colors.black,
                     fillColor: Colors.black,
                     iconColor: Colors.black,
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
                     labelText: 'Additional Directions or Comments',
-                    labelStyle: TextStyle(
+                    hintText: hintDirections,
+                    labelStyle: const TextStyle(
                       decorationColor: Colors.black,
                       color: Colors.black,
                     ),
-                    border: UnderlineInputBorder(),
+                    hintStyle: const TextStyle(
+                        decorationColor: Colors.black, color: Colors.black),
+                    border: const UnderlineInputBorder(),
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -294,15 +323,17 @@ class _DiarifySettingsState extends State<DiarifySettings> {
                   backgroundColor: MaterialStateProperty.all(Colors.black),
                 ),
                 onPressed: () {
-                  // Save the selected choices and additional directions/comments here
-                  print("Word limit: $selectedWordLimit");
-                  print("Style: $selectedStyle");
-                  print("Emotion tags required? $selectedEmotionTags");
-                  print("Try: $selectedTry");
-                  print(
-                      "Add inspirational quotes? $selectedInspirationalQuotes");
-                  print(
-                      "Additional Directions/Comments: $additionalDirections");
+                  // Update the settings in the provider context
+                  DiarySettingsModel newSettings = DiarySettingsModel()
+                    ..selectedWordLimit = selectedWordLimit
+                    ..selectedStyle = selectedStyle
+                    ..selectedTry = selectedTry
+                    ..selectedEmotionTags = selectedEmotionTags
+                    ..selectedInspirationalQuotes = selectedInspirationalQuotes
+                    ..additionalDirections = additionalDirections;
+
+                  context.read<AuthService>().settings = newSettings;
+                  Navigator.pop(context);
                 },
                 icon: const Icon(
                   Icons.save,

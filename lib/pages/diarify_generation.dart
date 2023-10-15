@@ -15,12 +15,12 @@ class DiarifyGeneration extends StatefulWidget {
 
 class _DiarifyGenerationState extends State<DiarifyGeneration> {
   final openAI = OpenAI.instance.build(
-      token: '',
+      token: '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',
       baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
       enableLog: true);
 
   Future<String> convertSpeechToText(String path) async {
-    const apiKey = '';
+    const apiKey = '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';
     var url = Uri.https("api.openai.com", "/v1/audio/transcriptions");
     var request = http.MultipartRequest('POST', url);
     request.headers.addAll(({"Authorization": "Bearer $apiKey"}));

@@ -97,9 +97,9 @@ class _DiarifyHomeState extends State<DiarifyHome> {
                     ),
                     onPressed: () {
                       // AuthService().logout();
-                      Navigator.pushReplacement(context, MaterialPageRoute(
+                      Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
-                          return DiarifySettings();
+                          return const DiarifySettings();
                         },
                       ));
                     },
