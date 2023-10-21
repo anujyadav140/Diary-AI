@@ -1,5 +1,6 @@
 import 'package:diarify/authentication/authgate.dart';
 import 'package:diarify/firebase_options.dart';
+import 'package:diarify/pages/diarify_generation.dart';
 import 'package:diarify/pages/home.dart';
 import 'package:diarify/pages/login.dart';
 import 'package:diarify/services/authservice.dart';
