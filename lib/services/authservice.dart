@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 
 class AuthService extends ChangeNotifier {
   //instance of auth
@@ -103,12 +104,26 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  int _currentDayIndex = 0;
+  int _diaryEntryCount = 1;
+  int get diaryEntryCount => _diaryEntryCount;
+  set diaryEntryCount(int value) {
+    _diaryEntryCount = value;
+    notifyListeners();
+  }
+
+  int _currentDayIndex = 1;
 
   int get currentDayIndex => _currentDayIndex;
 
   set currentDayIndex(int value) {
     _currentDayIndex = value;
+    notifyListeners();
+  }
+
+  bool _isMicActive = false;
+  bool get isMicActive => _isMicActive;
+  set isMicActive(bool value) {
+    _isMicActive = value;
     notifyListeners();
   }
 
@@ -123,7 +138,7 @@ class AuthService extends ChangeNotifier {
 }
 
 class DiarySettingsModel {
-  String selectedWordLimit = '300';
+  String selectedWordLimit = '250';
   String selectedStyle = 'Casual';
   String selectedTry = 'Be factual';
   String selectedEmotionTags = 'Yes';

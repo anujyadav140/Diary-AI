@@ -145,10 +145,17 @@ class _DiarifySettingsState extends State<DiarifySettings> {
                 spacing: 8,
                 children: [
                   CustomChoiceChip(
-                    label: '100',
-                    selected: selectedWordLimit == '100',
+                    label: '200',
+                    selected: selectedWordLimit == '200',
                     onSelected: (selected) {
-                      handleChoiceSelected('100', 'WordLimit');
+                      handleChoiceSelected('200', 'WordLimit');
+                    },
+                  ),
+                  CustomChoiceChip(
+                    label: '250',
+                    selected: selectedWordLimit == '250',
+                    onSelected: (selected) {
+                      handleChoiceSelected('250', 'WordLimit');
                     },
                   ),
                   CustomChoiceChip(
@@ -156,13 +163,6 @@ class _DiarifySettingsState extends State<DiarifySettings> {
                     selected: selectedWordLimit == '300',
                     onSelected: (selected) {
                       handleChoiceSelected('300', 'WordLimit');
-                    },
-                  ),
-                  CustomChoiceChip(
-                    label: '500',
-                    selected: selectedWordLimit == '500',
-                    onSelected: (selected) {
-                      handleChoiceSelected('500', 'WordLimit');
                     },
                   ),
                 ],
@@ -230,10 +230,7 @@ class _DiarifySettingsState extends State<DiarifySettings> {
               ),
               Text(
                 "Emotion tags required?",
-                style: TextStyle(
-                  fontSize: w / 25,
-                  color: Colors.black,
-                ),
+                style: TextStyle(fontSize: w / 25, color: Colors.black),
               ),
               Wrap(
                 spacing: 8,

@@ -6,7 +6,9 @@ import 'package:diarify/components/idle.dart';
 import 'package:diarify/components/slide_act.dart';
 import 'package:diarify/components/audio_player.dart';
 import 'package:diarify/pages/diarify_generation.dart';
+import 'package:diarify/pages/full_diary_entry.dart';
 import 'package:diarify/services/authservice.dart';
+import 'package:diarify/services/diarify_services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ import 'package:rive/rive.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DiarifyHomeContent extends StatefulWidget {
   const DiarifyHomeContent({super.key});
@@ -32,7 +36,6 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   String path = '';
   String? musicFile;
   bool isRecording = false;
-  bool isMicActive = false;
   bool isRecordingCompleted = false;
   bool isLoading = true;
   Directory appDirectory = Directory('');
@@ -59,6 +62,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
     super.initState();
     _getDir();
     _initialiseControllers();
+    loadData();
   }
 
   void _getDir() async {
@@ -84,6 +88,37 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   }
 
   DateTime selectedDate = DateTime.now(); // Initialize with the current date
+  String title = "";
+  DateTime dateTime = DateTime.now();
+  List<dynamic> tags = [];
+  Future<void> loadData() async {
+    try {
+      DocumentSnapshot? latestEntry =
+          await DiarifyServices().getLatestDiaryEntry();
+
+      if (latestEntry != null && latestEntry.exists) {
+        // Access the data within the document
+        title = latestEntry['title'];
+        Timestamp time = latestEntry['time'];
+        String entry = latestEntry['entry'];
+        tags = latestEntry['tags'];
+
+        // Convert the Timestamp to a DateTime
+        dateTime = time.toDate();
+
+        // formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+        // Now you can use the retrieved data as needed
+        print('Title: $title');
+        print('Time: $dateTime');
+        print('Entry: $entry');
+        print('Emotion Tags: $tags');
+      } else {
+        print('No latest diary entry found.');
+      }
+    } catch (e) {
+      print('Error loading data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,12 +150,21 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
               ]),
             ),
             const SizedBox(height: 20),
-            !isMicActive
+            !context.read<AuthService>().isMicActive
                 ? DiarifySnippet(
-                    date: "#1\n${DateFormat('EE\ndd').format(selectedDate)}",
-                    time: "00:00",
-                    diaryContent:
-                        "Today... was... a... really... nice... day...")
+                    date:
+                        "${DateFormat('dd/MM').format(dateTime)}\n${DateFormat('HH:mm').format(dateTime)}\n${DateFormat('EEE').format(dateTime)}",
+                    diaryContent: title,
+                    expandDiarySnippet: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return const FullDiaryEntry();
+                        },
+                      ));
+                    },
+                    tags: tags,
+                    entryCount: 0,
+                  )
                 : Expanded(
                     child: Container(
                       width: MediaQuery.of(context).size.width,
@@ -217,8 +261,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                                                   20), // Add some spacing between the GestureDetector widgets
                                           GestureDetector(
                                             onTap: () {
-                                              print(path);
-                                              Navigator.push(context,
+                                              Navigator.pushReplacement(context,
                                                   MaterialPageRoute(
                                                 builder: (context) {
                                                   return DiarifyGeneration(
@@ -251,7 +294,9 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            isMicActive = false;
+                                            context
+                                                .read<AuthService>()
+                                                .isMicActive = false;
                                           });
                                         },
                                         child: const Column(
@@ -314,7 +359,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
               backgroundColor: Colors.black,
               onPressed: () {
                 setState(() {
-                  isMicActive = true;
+                  context.read<AuthService>().isMicActive = true;
                 });
                 _startOrStopRecording();
               },

@@ -1,18 +1,28 @@
+import 'dart:async';
+
+import 'package:diarify/components/chips.dart';
+import 'package:diarify/services/diarify_services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rive/rive.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DiarifySnippet extends StatefulWidget {
   const DiarifySnippet(
       {super.key,
       required this.date,
-      required this.time,
-      required this.diaryContent});
+      required this.diaryContent,
+      required this.expandDiarySnippet,
+      required this.tags,
+      required this.entryCount});
+  final int entryCount;
   final String date;
-  final String time;
+
   final String diaryContent;
+  final List<dynamic> tags;
+  final VoidCallback expandDiarySnippet;
 
   @override
   State<DiarifySnippet> createState() => _DiarifySnippetState();
@@ -23,10 +33,11 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
   bool isClick = false;
   SMIInput<bool>? isRiveClicked;
   bool isRiveAnimationPlaying = false;
+
   String getCurrentTime() {
     final now = DateTime.now();
     final formattedTime =
-        DateFormat('hh:mm a').format(now); // Format the time as desired
+        DateFormat('HH:mm').format(now); // Format the time as desired
     return formattedTime;
   }
 
@@ -37,12 +48,18 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
     return formattedDate;
   }
 
+  String currentTime = "";
   @override
   void initState() {
+    currentTime = getCurrentTime(); // Initialize with the current time
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        currentTime = getCurrentTime();
+      });
+    });
     super.initState();
   }
 
-  List<String> tags = ['Funny', 'Sad', 'Eclectic', 'Anecdotal'];
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -59,7 +76,7 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
         child: Column(
           children: [
             Text(
-              "${getCurrentDate()} - ${getCurrentTime()}",
+              "${getCurrentDate()} - $currentTime", // Use the updated time
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width / 20,
               ),
@@ -71,59 +88,63 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
-                      "Diary Entry #121:",
+                      "Diary Entry #${widget.entryCount}:",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.width / 25,
                           color: Colors.black),
                     ),
                   ),
                 ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  margin: const EdgeInsets.only(top: 10),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(2, 2),
-                      ),
-                    ],
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 10.0),
-                        decoration: const BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                GestureDetector(
+                  onTap: widget.expandDiarySnippet,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.15,
+                    margin: const EdgeInsets.only(top: 10),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(2, 2),
                         ),
-                        child: Center(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 12.0, right: 30.0),
-                            child: Text(
-                              widget.date,
-                              style: TextStyle(
-                                  fontSize:
-                                      MediaQuery.of(context).size.width / 22,
-                                  color: Colors.white),
+                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(right: 10.0),
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 12.0, right: 30.0),
+                              child: Text(
+                                widget.date,
+                                style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width / 22,
+                                    color: Colors.white),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          widget.diaryContent,
-                          style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width / 30),
+                        Expanded(
+                          child: Text(
+                            widget.diaryContent,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width / 30),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -142,30 +163,9 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                     ),
                   ),
                 ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(tags.length, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Chip(
-                          elevation: 0.8,
-                          shape: ContinuousRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          label: Text(
-                            tags[index],
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.width / 30,
-                                color: Colors.white),
-                          ),
-                          backgroundColor: Colors.black,
-                          shadowColor: Colors.black,
-                        ),
-                      );
-                    }),
-                  ),
-                ),
+                widget.tags.isEmpty
+                    ? const CircularProgressIndicator()
+                    : TagChips(tags: widget.tags),
               ],
             ),
             Row(
