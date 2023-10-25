@@ -94,7 +94,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   Future<void> loadData() async {
     try {
       DocumentSnapshot? latestEntry =
-          await DiarifyServices().getLatestDiaryEntry();
+          await DiarifyServices().getLatestDiaryEntry(context);
 
       if (latestEntry != null && latestEntry.exists) {
         // Access the data within the document

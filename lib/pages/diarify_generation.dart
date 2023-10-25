@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:diarify/components/chips.dart';
+import 'package:diarify/pages/camera.dart';
 import 'package:diarify/pages/home.dart';
 import 'package:diarify/services/authservice.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:camera/camera.dart';
 
 class DiarifyGeneration extends StatefulWidget {
   const DiarifyGeneration({super.key, required this.path});
@@ -21,6 +27,8 @@ class DiarifyGeneration extends StatefulWidget {
 }
 
 class _DiarifyGenerationState extends State<DiarifyGeneration> {
+  late final CameraController _cameraController;
+
   final openAI = OpenAI.instance.build(
       token: '',
       baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
@@ -39,6 +47,13 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
     final responseData = json.decode(newResponse.body);
     print(responseData['text']);
     return responseData['text'];
+  }
+
+  Future<XFile?> _pickImage() async {
+    final imagePicker = ImagePicker();
+    XFile? pickedImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    return pickedImage;
   }
 
   List<String> emotionTags = [];
@@ -66,7 +81,7 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
         // Format the date using DateFormat
         final dateFormat = DateFormat("dd-MM-yyyy");
         final dateFormatted = dateFormat.format(date);
-
+        context.read<AuthService>().saveDiaryDate = dateFormatted;
         final documentReference = collectionReference.doc(dateFormatted);
 
         // Create a subcollection for each entry
@@ -96,18 +111,32 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
     }
   }
 
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    if (cameras.isNotEmpty) {
+      _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
+      await _cameraController.initialize();
+      if (!mounted) {
+        return;
+      }
+      setState(() {}); // Rebuild the widget to display the camera preview
+    }
+  }
+
   bool displaySave = false;
   @override
   void initState() {
     convertSpeechToText(widget.path)
         .then((value) => generateDiaryEntry(value))
         .then((value) => displaySave = true);
+    _initializeCamera();
     super.initState();
   }
 
   @override
   void dispose() {
     _sseResponseController.close();
+    _cameraController.dispose();
     super.dispose();
   }
 
@@ -260,33 +289,48 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
             ),
           ),
         ),
-        floatingActionButton: displaySave
-            ? FloatingActionButton.extended(
-                label: const Text('Save Diary Entry'),
-                onPressed: () {
-                  final count = context.read<AuthService>().diaryEntryCount++;
-                  saveDiaryEntry(titleText, emotionTags, entryText, count);
-                  setState(() {
-                    context.read<AuthService>().isMicActive = false;
-                  });
-                  Navigator.pushReplacement(context, MaterialPageRoute(
-                    builder: (context) {
-                      return const DiarifyHome();
-                    },
-                  ));
-                  // Show a Snackbar with the message "Diary Saved"
-                  const snackBar = SnackBar(
-                    backgroundColor: Colors.white,
-                    content: Text('Diary Saved',
-                        style: TextStyle(color: Colors.black)),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                },
-                icon: const Icon(Icons.save),
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-              )
-            : null,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FloatingActionButton(
+              backgroundColor: Colors.black,
+              onPressed: () async {
+                XFile? pickedImage = await _pickImage();
+                if (pickedImage != null) {
+                  // Handle the picked image (e.g., upload to a cloud storage service).
+                  // You can use Firebase Storage to upload the image.
+                  String imageName = path.basename(pickedImage.path);
+                  Reference storageReference =
+                      FirebaseStorage.instance.ref().child(imageName);
+                  UploadTask uploadTask =
+                      storageReference.putFile(File(pickedImage.path));
+                  await uploadTask.whenComplete(() => print('Image uploaded'));
+                }
+              },
+              tooltip: 'Pick Image',
+              child: const Icon(Icons.photo_size_select_actual_rounded,
+                  size: 20, color: Colors.white),
+            ),
+            const SizedBox(width: 20),
+            FloatingActionButton(
+              backgroundColor: Colors.black,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CameraScreen(
+                      cameraController: _cameraController,
+                    ),
+                  ),
+                );
+              },
+              tooltip: 'Take a Photo',
+              child:
+                  const Icon(Icons.photo_camera, size: 20, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

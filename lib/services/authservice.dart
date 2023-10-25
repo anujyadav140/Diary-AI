@@ -120,6 +120,13 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  String _saveDiaryDate = '23-10-2023';
+  String get saveDiaryDate => _saveDiaryDate;
+  set saveDiaryDate(String value) {
+    _saveDiaryDate = value;
+    notifyListeners();
+  }
+
   bool _isMicActive = false;
   bool get isMicActive => _isMicActive;
   set isMicActive(bool value) {

@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:camera/camera.dart';
 
 void main() async {
   // await dotenv.load(fileName: ".env");
@@ -40,10 +41,10 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // home: const DiarifyHome(),
-      home: const AuthGate(),
-      // home: DiarifyGeneration(
-      //   path: '',
-      // ),
+      // home: const AuthGate(),
+      home: DiarifyGeneration(
+        path: '',
+      ),
     );
   }
 }
