@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:diarify/services/diarify_services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -15,10 +16,17 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   XFile? capturedImage;
+  String? imageDownloadUrl;
+  FlashMode flashMode = FlashMode.off; // Set flash mode to "off"
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -33,12 +41,14 @@ class _CameraScreenState extends State<CameraScreen> {
           ? FloatingActionButton(
               backgroundColor: Colors.white,
               onPressed: () async {
+                widget.cameraController.setFlashMode(FlashMode.auto);
                 try {
                   final XFile photo =
                       await widget.cameraController.takePicture();
                   setState(() {
                     capturedImage = photo;
                   });
+                  widget.cameraController.setFlashMode(FlashMode.off);
                 } catch (e) {
                   print('Error taking a photo: $e');
                 }
@@ -62,26 +72,10 @@ class _CameraScreenState extends State<CameraScreen> {
                 FloatingActionButton(
                   backgroundColor: Colors.white,
                   onPressed: () async {
-                    try {
-                      final XFile photo =
-                          await widget.cameraController.takePicture();
-                      // Generate a unique image name
-                      const uuid = Uuid();
-                      String imageName = '${uuid.v4()}.jpg';
-
-                      // Reference to the Firebase Storage bucket
-                      Reference storageReference =
-                          FirebaseStorage.instance.ref().child(imageName);
-
-                      // Upload the image to Firebase Storage
-                      await storageReference.putFile(File(photo.path));
-
-                      print(
-                          'Photo uploaded to Firebase Storage with name: $imageName');
-                      Navigator.pop(context); // Close the camera screen
-                    } catch (e) {
-                      print('Error taking a photo or uploading it: $e');
-                    }
+                    await DiarifyServices()
+                        .uploadImageToFirebase(capturedImage!, context);
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
                   },
                   child: const Icon(Icons.check, size: 20, color: Colors.black),
                 ),

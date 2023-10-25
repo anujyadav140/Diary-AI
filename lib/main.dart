@@ -41,10 +41,10 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // home: const DiarifyHome(),
-      // home: const AuthGate(),
-      home: DiarifyGeneration(
-        path: '',
-      ),
+      home: const AuthGate(),
+      // home: DiarifyGeneration(
+      //   path: '',
+      // ),
     );
   }
 }

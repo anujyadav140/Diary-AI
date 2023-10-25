@@ -111,6 +111,20 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  String _diarifyImageLink = '';
+  String get diarifyImageLink => _diarifyImageLink;
+  set diarifyImageLink(String value) {
+    _diarifyImageLink = value;
+    notifyListeners();
+  }
+
+  bool _imageDone = false;
+  bool get imageDone => _imageDone;
+  set imageDone(bool value) {
+    _imageDone = value;
+    notifyListeners();
+  }
+
   int _currentDayIndex = 1;
 
   int get currentDayIndex => _currentDayIndex;

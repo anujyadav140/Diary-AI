@@ -62,7 +62,9 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
     super.initState();
     _getDir();
     _initialiseControllers();
-    loadData();
+    DiarifyServices()
+        .getDiarifyDatePointer(context)
+        .then((date) => loadData(date));
   }
 
   void _getDir() async {
@@ -91,10 +93,12 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   String title = "";
   DateTime dateTime = DateTime.now();
   List<dynamic> tags = [];
-  Future<void> loadData() async {
+  String link = "";
+  int count = 0;
+  Future<void> loadData(String? date) async {
     try {
       DocumentSnapshot? latestEntry =
-          await DiarifyServices().getLatestDiaryEntry(context);
+          await DiarifyServices().getLatestDiaryEntry(date);
 
       if (latestEntry != null && latestEntry.exists) {
         // Access the data within the document
@@ -102,16 +106,18 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
         Timestamp time = latestEntry['time'];
         String entry = latestEntry['entry'];
         tags = latestEntry['tags'];
-
+        link = latestEntry['link'];
+        count = latestEntry['count'];
         // Convert the Timestamp to a DateTime
         dateTime = time.toDate();
-
+        setState(() {});
         // formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
         // Now you can use the retrieved data as needed
         print('Title: $title');
         print('Time: $dateTime');
         print('Entry: $entry');
         print('Emotion Tags: $tags');
+        print('image link: $link');
       } else {
         print('No latest diary entry found.');
       }
@@ -163,7 +169,8 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                       ));
                     },
                     tags: tags,
-                    entryCount: 0,
+                    entryCount: count,
+                    link: link,
                   )
                 : Expanded(
                     child: Container(
@@ -261,6 +268,9 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                                                   20), // Add some spacing between the GestureDetector widgets
                                           GestureDetector(
                                             onTap: () {
+                                              context
+                                                  .read<AuthService>()
+                                                  .imageDone = false;
                                               Navigator.pushReplacement(context,
                                                   MaterialPageRoute(
                                                 builder: (context) {

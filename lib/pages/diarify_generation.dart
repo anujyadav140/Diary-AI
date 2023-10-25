@@ -5,6 +5,7 @@ import 'package:diarify/components/chips.dart';
 import 'package:diarify/pages/camera.dart';
 import 'package:diarify/pages/home.dart';
 import 'package:diarify/services/authservice.dart';
+import 'package:diarify/services/diarify_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -18,6 +19,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
+import 'package:uuid/uuid.dart';
 
 class DiarifyGeneration extends StatefulWidget {
   const DiarifyGeneration({super.key, required this.path});
@@ -65,51 +67,6 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
 
   final StreamController<String> _sseResponseController =
       StreamController<String>.broadcast();
-
-  Future<void> saveDiaryEntry(
-      String title, List<String> emotionTags, String entry, int count) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final userEmail = user.email;
-        final date = DateTime.now();
-        final time = Timestamp.fromDate(date);
-
-        final collectionReference =
-            FirebaseFirestore.instance.collection(userEmail!);
-
-        // Format the date using DateFormat
-        final dateFormat = DateFormat("dd-MM-yyyy");
-        final dateFormatted = dateFormat.format(date);
-        context.read<AuthService>().saveDiaryDate = dateFormatted;
-        final documentReference = collectionReference.doc(dateFormatted);
-
-        // Create a subcollection for each entry
-        final entryCollection = documentReference.collection("entries");
-
-        // Format the time into a human-readable format
-        final timeFormat = DateFormat("h:mm a");
-        final timeFormatted = timeFormat.format(date);
-
-        // Use the formatted time as the document ID
-        final entryDocument = entryCollection.doc(timeFormatted);
-
-        await entryDocument.set({
-          'count': count,
-          'title': title,
-          'time': time,
-          'entry': entry,
-          'tags': emotionTags,
-        });
-
-        print('Diary entry saved successfully.');
-      } else {
-        print('User not signed in.');
-      }
-    } catch (e) {
-      print('Error saving diary entry: $e');
-    }
-  }
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -197,13 +154,18 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
                 Give an accurate title to the diary entry as: "Title: ". 
                 $emotionTags.
                 $inspirationalQuotes. $instructions.
-                always write the diary entry, do not just write the title and tag, add content too.'''),
+                always write the diary entry, do not just write the title and tag, add content too.
+                 always follow this template:
+                Title: **title name**
+                Tags: **tag1, tag2, tag3**
+                
+                **diary entry content**'''),
         Messages(role: Role.user, content: transcribed),
       ],
       model: GptTurboChatModel(),
       temperature: 0.9,
       stream: true,
-      maxToken: 500,
+      maxToken: 600,
     );
 
     openAI.onChatCompletionSSE(request: request).listen((it) {
@@ -243,95 +205,135 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Diary Generation'),
-        // ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Title:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                titleText.isEmpty ? Text('...') : Text(titleText),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Tags:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                emotionTags.isEmpty ? Text('...') : TagChips(tags: emotionTags),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Entry:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                StreamBuilder<String>(
-                  stream: _sseResponseController.stream,
-                  builder: (context, snapshot) {
-                    return Text(snapshot.hasData ? snapshot.data! : '');
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.1)
-              ],
-            ),
-          ),
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            FloatingActionButton(
-              backgroundColor: Colors.black,
-              onPressed: () async {
-                XFile? pickedImage = await _pickImage();
-                if (pickedImage != null) {
-                  // Handle the picked image (e.g., upload to a cloud storage service).
-                  // You can use Firebase Storage to upload the image.
-                  String imageName = path.basename(pickedImage.path);
-                  Reference storageReference =
-                      FirebaseStorage.instance.ref().child(imageName);
-                  UploadTask uploadTask =
-                      storageReference.putFile(File(pickedImage.path));
-                  await uploadTask.whenComplete(() => print('Image uploaded'));
-                }
-              },
-              tooltip: 'Pick Image',
-              child: const Icon(Icons.photo_size_select_actual_rounded,
-                  size: 20, color: Colors.white),
-            ),
-            const SizedBox(width: 20),
-            FloatingActionButton(
-              backgroundColor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CameraScreen(
-                      cameraController: _cameraController,
+          // appBar: AppBar(
+          //   title: const Text('Diary Generation'),
+          // ),
+          body: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Title:",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                );
-              },
-              tooltip: 'Take a Photo',
-              child:
-                  const Icon(Icons.photo_camera, size: 20, color: Colors.white),
+                  titleText.isEmpty ? const Text('...') : Text(titleText),
+                  const SizedBox(height: 20),
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Tags:",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  emotionTags.isEmpty
+                      ? const Text('...')
+                      : TagChips(tags: emotionTags),
+                  const SizedBox(height: 20),
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Entry:",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  StreamBuilder<String>(
+                    stream: _sseResponseController.stream,
+                    builder: (context, snapshot) {
+                      return Text(snapshot.hasData ? snapshot.data! : '');
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                  Image.network(
+                    context.watch<AuthService>().diarifyImageLink,
+                    height: 100,
+                    width: 200,
+                  )
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
+          ),
+          floatingActionButton: displaySave
+              ? !context.read<AuthService>().imageDone
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FloatingActionButton(
+                          backgroundColor: Colors.black,
+                          onPressed: () async {
+                            XFile? pickedImage = await _pickImage();
+                            if (pickedImage != null) {
+                              // ignore: use_build_context_synchronously
+                              await DiarifyServices()
+                                  .uploadImageToFirebase(pickedImage, context);
+                              setState(() {});
+                            }
+                          },
+                          tooltip: 'Pick Image',
+                          child: const Icon(
+                              Icons.photo_size_select_actual_rounded,
+                              size: 20,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(width: 20),
+                        FloatingActionButton(
+                          backgroundColor: Colors.black,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CameraScreen(
+                                  cameraController: _cameraController,
+                                ),
+                              ),
+                            );
+                          },
+                          tooltip: 'Take a Photo',
+                          child: const Icon(Icons.photo_camera,
+                              size: 20, color: Colors.white),
+                        ),
+                      ],
+                    )
+                  : FloatingActionButton.extended(
+                      label: const Text('Save Diary Entry'),
+                      onPressed: () {
+                        context.read<AuthService>().diaryEntryCount =
+                            context.read<AuthService>().diaryEntryCount + 1;
+                        DiarifyServices().saveDiaryEntry(
+                            titleText,
+                            emotionTags,
+                            entryText,
+                            context.read<AuthService>().diaryEntryCount,
+                            context.read<AuthService>().diarifyImageLink,
+                            context);
+                        setState(() {
+                          context.read<AuthService>().isMicActive = false;
+                          context.read<AuthService>().diarifyImageLink = '';
+                        });
+                        Navigator.pushReplacement(context, MaterialPageRoute(
+                          builder: (context) {
+                            return const DiarifyHome();
+                          },
+                        ));
+                        // Show a Snackbar with the message "Diary Saved"
+                        const snackBar = SnackBar(
+                          backgroundColor: Colors.white,
+                          content: Text('Diary Saved',
+                              style: TextStyle(color: Colors.black)),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      },
+                      icon: const Icon(Icons.save),
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                    )
+              : null),
     );
   }
 }

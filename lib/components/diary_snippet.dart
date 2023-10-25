@@ -16,10 +16,11 @@ class DiarifySnippet extends StatefulWidget {
       required this.diaryContent,
       required this.expandDiarySnippet,
       required this.tags,
-      required this.entryCount});
+      required this.entryCount,
+      required this.link});
   final int entryCount;
   final String date;
-
+  final String link;
   final String diaryContent;
   final List<dynamic> tags;
   final VoidCallback expandDiarySnippet;
@@ -187,17 +188,28 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                     ],
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
+                  // child: Column(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Text(
+                  //       'Add image here',
+                  //       style: TextStyle(
+                  //           fontSize: MediaQuery.of(context).size.width / 30),
+                  //     ),
+                  //     IconButton(
+                  //       onPressed: () {},
+                  //       icon: const Icon(Icons.image),
+                  //     ),
+                  //   ],
+                  // ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Add image here',
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width / 30),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.image),
+                      Image.network(
+                        widget.link, // Replace with the actual image URL
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height * 0.25,
+                        width: MediaQuery.of(context).size.width * 0.4,
                       ),
                     ],
                   ),
