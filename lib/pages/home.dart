@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:diarify/components/home_content.dart';
 import 'package:diarify/components/slide_act.dart';
@@ -9,6 +10,7 @@ import 'package:diarify/pages/day_diary.dart';
 import 'package:diarify/pages/diarify_generation.dart';
 import 'package:diarify/pages/settings.dart';
 import 'package:diarify/services/authservice.dart';
+import 'package:diarify/services/test.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +49,29 @@ class _DiarifyHomeState extends State<DiarifyHome> {
     super.initState();
   }
 
+  final HttpsCallable _chatWithDiary =
+      FirebaseFunctions.instanceFor(region: 'us-central1')
+          .httpsCallable('chatWithDiary');
+  Future<void> callChatWithDiary() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final response = await _chatWithDiary.call({
+          'question': "Did i ever teach vector databases?",
+          'user': user.email,
+        });
+        print('Response from chatWithDiary: ${response.data}');
+      } else {
+        print('User is not authenticated.');
+      }
+    } catch (e) {
+      print('Error calling chatWithDiary: $e');
+    }
+  }
+
   @override
   void dispose() {
-    pageController.dispose(); // Dispose the page controller
+    pageController.dispose();
     super.dispose();
   }
 
@@ -97,11 +119,18 @@ class _DiarifyHomeState extends State<DiarifyHome> {
                     ),
                     onPressed: () {
                       // AuthService().logout();
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) {
-                          return const DiarifySettings();
-                        },
-                      ));
+                      // Navigator.push(context, MaterialPageRoute(
+                      //   builder: (context) {
+                      //     return const DiarifySettings();
+                      //   },
+                      // ));
+                      // Tester()
+                      //     .callLineFinisherFunction(
+                      //         "to be or not to be that is the question")
+                      //     .then((value) => print(value));
+                      // Tester().callCloudFunction();
+                      // Tester().callHelloFunction();
+                      callChatWithDiary();
                     },
                   ),
           ]),

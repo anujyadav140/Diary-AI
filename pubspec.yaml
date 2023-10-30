@@ -64,6 +64,7 @@ dev_dependencies:
   image_picker: ^1.0.4
   camera: ^0.10.5+5
   uuid: ^4.1.0
+  firebase_ui_auth: ^1.9.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

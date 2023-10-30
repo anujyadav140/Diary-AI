@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:chat_gpt_sdk/src/embedding.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:diarify/components/chips.dart';
 import 'package:diarify/pages/camera.dart';
 import 'package:diarify/pages/home.dart';
 import 'package:diarify/services/authservice.dart';
 import 'package:diarify/services/diarify_services.dart';
+import 'package:diarify/services/test.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -108,6 +111,26 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
     return matches.length;
   }
 
+  final HttpsCallable _vectorDiaryEntry =
+      FirebaseFunctions.instanceFor(region: 'us-central1')
+          .httpsCallable('vectorDiaryEntry');
+  Future<void> callVectorEntryFunction(String entry) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final response = await _vectorDiaryEntry.call({
+          'entry': entry,
+          'user': user.email,
+        });
+        print('Response from vectorDiaryEntry: ${response.data}');
+      } else {
+        print('User is not authenticated.');
+      }
+    } catch (e) {
+      print('Error calling vectorDiaryEntry: $e');
+    }
+  }
+
   void generateDiaryEntry(String transcribed) {
     String wordCount = context.read<AuthService>().settings.selectedWordLimit;
     String style = context.read<AuthService>().settings.selectedStyle;
@@ -145,20 +168,20 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
         Messages(
             role: Role.assistant,
             content:
-                '''you have to rewrite this transcription as journal entry, $tone, 
+                '''you have to rewrite this transcription as journal entry, $tone,
                 remember to use simple, ordinary language, and the writing,
                 style should be $style,this is the transcription: "$transcribed".
                 do not be wordy, be concise, and use $requiredWordCount words,
-                just write what is present in the transcription,  
-                totally avoid "Dear Diary" and alternatives of it. 
-                Give an accurate title to the diary entry as: "Title: ". 
+                just write what is present in the transcription,
+                totally avoid "Dear Diary" and alternatives of it.
+                Give an accurate title to the diary entry as: "Title: ".
                 $emotionTags.
                 $inspirationalQuotes. $instructions.
                 always write the diary entry, do not just write the title and tag, add content too.
                  always follow this template:
                 Title: **title name**
                 Tags: **tag1, tag2, tag3**
-                
+
                 **diary entry content**'''),
         Messages(role: Role.user, content: transcribed),
       ],
@@ -205,18 +228,21 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          // appBar: AppBar(
-          //   title: const Text('Diary Generation'),
-          // ),
+          appBar: AppBar(
+            title: const Text('Diary Generation'),
+            actions: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.abc))
+            ],
+          ),
           body: SingleChildScrollView(
             child: Center(
               child: Column(
                 children: [
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      "Title:",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      titleText,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   titleText.isEmpty ? const Text('...') : Text(titleText),
@@ -312,6 +338,7 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
                             context.read<AuthService>().diaryEntryCount,
                             context.read<AuthService>().diarifyImageLink,
                             context);
+                        callVectorEntryFunction(entryText);
                         setState(() {
                           context.read<AuthService>().isMicActive = false;
                           context.read<AuthService>().diarifyImageLink = '';

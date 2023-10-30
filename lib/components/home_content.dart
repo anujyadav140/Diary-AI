@@ -94,6 +94,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
   DateTime dateTime = DateTime.now();
   List<dynamic> tags = [];
   String link = "";
+  String entry = "";
   int count = 0;
   Future<void> loadData(String? date) async {
     try {
@@ -104,7 +105,7 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
         // Access the data within the document
         title = latestEntry['title'];
         Timestamp time = latestEntry['time'];
-        String entry = latestEntry['entry'];
+        entry = latestEntry['entry'];
         tags = latestEntry['tags'];
         link = latestEntry['link'];
         count = latestEntry['count'];
@@ -164,7 +165,13 @@ class _DiarifyHomeContentState extends State<DiarifyHomeContent> {
                     expandDiarySnippet: () {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
-                          return const FullDiaryEntry();
+                          return FullDiaryEntry(
+                            title: title,
+                            entry: entry,
+                            time: DateFormat('E MMM d y').format(dateTime),
+                            tags: tags,
+                            link: link,
+                          );
                         },
                       ));
                     },

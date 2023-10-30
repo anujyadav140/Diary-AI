@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:diarify/components/chips.dart';
+import 'package:diarify/components/diary_bar.dart';
+import 'package:diarify/components/image.dart';
 import 'package:diarify/services/diarify_services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -96,58 +98,10 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: widget.expandDiarySnippet,
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * 0.15,
-                    margin: const EdgeInsets.only(top: 10),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(right: 10.0),
-                          decoration: const BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 12.0, right: 30.0),
-                              child: Text(
-                                widget.date,
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width / 22,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            widget.diaryContent,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.width / 30),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                DiaryBar(
+                    expandDiarySnippet: widget.expandDiarySnippet,
+                    date: widget.date,
+                    diaryContent: widget.diaryContent)
               ],
             ),
             Column(
@@ -171,49 +125,7 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
             ),
             Row(
               children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.025,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(2, 2),
-                      ),
-                    ],
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  // child: Column(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     Text(
-                  //       'Add image here',
-                  //       style: TextStyle(
-                  //           fontSize: MediaQuery.of(context).size.width / 30),
-                  //     ),
-                  //     IconButton(
-                  //       onPressed: () {},
-                  //       icon: const Icon(Icons.image),
-                  //     ),
-                  //   ],
-                  // ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.network(
-                        widget.link, // Replace with the actual image URL
-                        fit: BoxFit.cover,
-                        height: MediaQuery.of(context).size.height * 0.25,
-                        width: MediaQuery.of(context).size.width * 0.4,
-                      ),
-                    ],
-                  ),
-                ),
+                DiarifyImage(link: widget.link),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment

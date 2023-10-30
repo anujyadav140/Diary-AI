@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,6 +43,15 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCUgxyE0m5Vl8G1BJgyAjATdKe2HXm-tW8',
+    appId: '1:789340116026:web:4d50c04e99a1af35881103',
+    messagingSenderId: '789340116026',
+    projectId: 'diarify-cd6e0',
+    authDomain: 'diarify-cd6e0.firebaseapp.com',
+    storageBucket: 'diarify-cd6e0.appspot.com',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDCCpxhJ0lD_oHxcPgdlFmo-_GYcjKzHP4',
     appId: '1:789340116026:android:9adb81688e979d4d881103',
@@ -63,6 +66,19 @@ class DefaultFirebaseOptions {
     messagingSenderId: '789340116026',
     projectId: 'diarify-cd6e0',
     storageBucket: 'diarify-cd6e0.appspot.com',
+    androidClientId: '789340116026-ihajqetp6rhkiksr2441f91njl23s4iv.apps.googleusercontent.com',
+    iosClientId: '789340116026-pajm0vflsligul9o52a7bk35b1s2jj7b.apps.googleusercontent.com',
     iosBundleId: 'com.example.diarifyAi',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAEIZTo1ynDNqkLASOKaRA8kbTvmHod7TY',
+    appId: '1:789340116026:ios:693f491bff416f44881103',
+    messagingSenderId: '789340116026',
+    projectId: 'diarify-cd6e0',
+    storageBucket: 'diarify-cd6e0.appspot.com',
+    androidClientId: '789340116026-ihajqetp6rhkiksr2441f91njl23s4iv.apps.googleusercontent.com',
+    iosClientId: '789340116026-6s0p5plnjebiltd2tlibm8m5qlg3oi1a.apps.googleusercontent.com',
+    iosBundleId: 'com.example.diarify.RunnerTests',
   );
 }
