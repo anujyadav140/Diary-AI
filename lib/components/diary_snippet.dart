@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:diarify/components/chips.dart';
 import 'package:diarify/components/diary_bar.dart';
 import 'package:diarify/components/image.dart';
+import 'package:diarify/pages/chat.dart';
 import 'package:diarify/services/diarify_services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -99,9 +100,12 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   ),
                 ),
                 DiaryBar(
-                    expandDiarySnippet: widget.expandDiarySnippet,
-                    date: widget.date,
-                    diaryContent: widget.diaryContent)
+                  expandDiarySnippet: widget.expandDiarySnippet,
+                  date: widget.date,
+                  diaryContent: widget.diaryContent,
+                  isImage: false,
+                  link: '',
+                )
               ],
             ),
             Column(
@@ -119,7 +123,7 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                   ),
                 ),
                 widget.tags.isEmpty
-                    ? const CircularProgressIndicator()
+                    ? const Text("Loading ...")
                     : TagChips(tags: widget.tags),
               ],
             ),
@@ -179,6 +183,15 @@ class _DiarifySnippetState extends State<DiarifySnippet> {
                               isRiveAnimationPlaying = !isRiveAnimationPlaying;
                             });
                             isRiveClicked?.change(isClick);
+                            Future.delayed(Duration(seconds: 2), () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return DiarifyChat(); // Replace YourNextPage with the actual page you want to navigate to.
+                                  },
+                                ),
+                              );
+                            });
                           },
                           child: RiveAnimation.asset(
                             'assets/hedgehog.riv',

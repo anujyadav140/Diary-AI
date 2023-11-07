@@ -32,12 +32,14 @@ class _DiarifyImageState extends State<DiarifyImage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.network(
-            widget.link, // Replace with the actual image URL
-            fit: BoxFit.cover,
-            height: MediaQuery.of(context).size.height * 0.25,
-            width: MediaQuery.of(context).size.width * 0.4,
-          ),
+          widget.link.isEmpty
+              ? const Text("Loading ...")
+              : Image.network(
+                  widget.link,
+                  fit: BoxFit.cover,
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  width: MediaQuery.of(context).size.width * 0.4,
+                ),
         ],
       ),
     );

@@ -38,6 +38,8 @@ class FullDiaryEntry extends StatelessWidget {
                   expandDiarySnippet: () {},
                   date: 'Title',
                   diaryContent: title,
+                  isImage: true,
+                  link: link,
                 ),
                 TagChips(tags: tags),
                 Text(entry),

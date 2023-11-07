@@ -338,7 +338,14 @@ class _DiarifyGenerationState extends State<DiarifyGeneration> {
                             context.read<AuthService>().diaryEntryCount,
                             context.read<AuthService>().diarifyImageLink,
                             context);
-                        callVectorEntryFunction(entryText);
+                        DateTime dateTime = DateTime.now();
+                        final DateFormat formatter =
+                            DateFormat('dd-MM-yyyy hh:mm a');
+                        String formattedDateTime = formatter.format(dateTime);
+                        String entryTextRequest =
+                            '''Date and Time: $formattedDateTime\n
+                            $entryText''';
+                        callVectorEntryFunction(entryTextRequest);
                         setState(() {
                           context.read<AuthService>().isMicActive = false;
                           context.read<AuthService>().diarifyImageLink = '';
